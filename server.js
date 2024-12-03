@@ -80,6 +80,23 @@ app.post('/users', async (req, res) => {
     }
 });
 
+app.post('/signin', async (req, res) => {
+    const { username, password } = req.body;
+    const user = await knex('users').where({ Username: username, Password: password }).first();
+
+    if (user) {
+        res.json(user);
+    } else {
+        res.status(401).send('Invalid username or password');
+    }
+});
+
+app.get('/users/:id/items', async (req, res) => {
+    const userId = req.params.id;
+    const items = await knex('items').where({ UserId: userId });
+    res.json(items);
+});
+
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
