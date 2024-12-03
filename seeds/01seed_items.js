@@ -20,6 +20,12 @@ exports.seed = async function (knex) {
           Description: 'i tried',
           Quantity: 5,
       },
+      {
+        UserId: 3,
+        ItemName: 'of creativity',
+        Description: 'i tried dwhuadhwiuadhoiaedao iwidhawi dbaiudheifneaodijd dhaiodhnanoaihdiue auhfoidoeucheaiuoh doianocaeiuh aoxnoaeucbaeiudha oniae uobaeiuheaonaei uchaeio',
+        Quantity: 5,
+    },
   ]);
 };
 
