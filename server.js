@@ -61,7 +61,6 @@ app.get('/items/:id', async (req, res) => {
 });
 
 
-
 app.post('/users', async (req, res) => {
     const { firstName, lastName, username, password } = req.body;
 
@@ -95,6 +94,28 @@ app.get('/users/:id/items', async (req, res) => {
     const userId = req.params.id;
     const items = await knex('items').where({ UserId: userId });
     res.json(items);
+});
+
+app.post('/items', async (req, res) => {
+    const { UserId, ItemName, Description, Quantity } = req.body;
+
+    if (!UserId || !ItemName || !Description || !Quantity) {
+        return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    try {
+        await knex('items').insert({
+            UserId,
+            ItemName,
+            Description,
+            Quantity,
+        });
+
+        res.status(201).json({ message: 'Item created successfully' });
+    } catch (error) {
+        console.error('Error creating item:', error);
+        res.status(500).json({ error: 'Failed to create item' });
+    }
 });
 
 
