@@ -118,6 +118,51 @@ app.post('/items', async (req, res) => {
     }
 });
 
+// PUT request to update an item's details
+app.put('/items/:id', async (req, res) => {
+    const { id } = req.params;
+    const { ItemName, Description, Quantity } = req.body;
+
+    if (!ItemName || !Description || !Quantity) {
+        return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    try {
+        const updatedRows = await knex('items')
+            .where({ id })
+            .update({
+                ItemName,
+                Description,
+                Quantity,
+            });
+
+        if (updatedRows) {
+            res.status(200).json({ message: 'Item updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Item not found' });
+        }
+    } catch (error) {
+        console.error('Error updating item:', error);
+        res.status(500).json({ error: 'Failed to update item' });
+    }
+});
+
+app.delete('/items/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deletedRows = await knex('items').where({ id }).del();
+        if (deletedRows) {
+            res.status(200).json({ message: 'Item deleted successfully' });
+        } else {
+            res.status(404).json({ error: 'Item not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        res.status(500).json({ error: 'Failed to delete item' });
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
