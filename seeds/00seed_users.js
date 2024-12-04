@@ -1,25 +1,13 @@
+const { faker } = require('@faker-js/faker');
+
 exports.seed = async function (knex) {
   await knex('users').del();
 
-  await knex('users').insert([
-      {
-          FirstName: 'Beeftonius',
-          LastName: 'Hamburger',
-          Username: 'beeft0nius',
-          Password: 'password',
-      },
-      {
-          FirstName: 'George',
-          LastName: 'Lopez',
-          Username: 'george',
-          Password: 'password2',
-      },
-      {
-          FirstName: 'Mario',
-          LastName: 'Mario',
-          Username: 'test',
-          Password: 'longerpassword',
-      },
-  ]);
-};
+const users = Array.from({ length: 100 }, () => ({
+    FirstName: faker.person.firstName(),
+    LastName: faker.person.lastName(),
+    Username: faker.internet.displayName(),
+    Password: faker.internet.password()
+  }))
 
+  await knex('users').insert(users)}
