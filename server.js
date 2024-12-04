@@ -37,13 +37,16 @@ app.get('/users/:id', async (req, res) => {
 
 app.get('/items', async (req, res) => {
     try {
-        const items = await knex('items').select('*');
-        res.status(200).json(items);
-    } catch (error) {
-        console.error('Error fetching items:', error);
-        res.status(500).json({ error: 'Failed to fetch items' });
+        const items = await knex('items')
+            .join('users', 'items.UserId', '=', 'users.Id')
+            .select('items.id', 'items.ItemName', 'items.Description', 'items.Quantity', 'users.FirstName', 'users.LastName');
+        res.json(items);
+    } catch (err) {
+        console.error('Error fetching items:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 app.get('/items/:id', async (req, res) => {
     const { id } = req.params;
@@ -71,7 +74,6 @@ app.post('/users', async (req, res) => {
             Username: username,
             Password: password,
         });
-
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
         console.error('Error creating user:', error);
@@ -102,7 +104,6 @@ app.post('/items', async (req, res) => {
     if (!UserId || !ItemName || !Description || !Quantity) {
         return res.status(400).json({ error: 'All fields are required.' });
     }
-
     try {
         await knex('items').insert({
             UserId,
@@ -110,7 +111,6 @@ app.post('/items', async (req, res) => {
             Description,
             Quantity,
         });
-
         res.status(201).json({ message: 'Item created successfully' });
     } catch (error) {
         console.error('Error creating item:', error);
