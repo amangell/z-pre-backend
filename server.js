@@ -4,6 +4,7 @@ const app = express();
 const environment = process.env.NODE_ENV || 'development';
 const knex = require('knex')(knexConfig[environment]);
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 const port = 5000;
 
 app.use(express.json());
@@ -63,16 +64,15 @@ app.get('/items/:id', async (req, res) => {
     }
 });
 
-
 app.post('/users', async (req, res) => {
     const { firstName, lastName, username, password } = req.body;
-
     try {
+        const hashedPassword = await bcrypt.hash(password, 10);
         await knex('users').insert({
             FirstName: firstName,
             LastName: lastName,
             Username: username,
-            Password: password,
+            Password: hashedPassword,
         });
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
@@ -81,14 +81,27 @@ app.post('/users', async (req, res) => {
     }
 });
 
+
 app.post('/signin', async (req, res) => {
     const { username, password } = req.body;
-    const user = await knex('users').where({ Username: username, Password: password }).first();
-
-    if (user) {
-        res.json(user);
-    } else {
-        res.status(401).send('Invalid username or password');
+    try {
+        const user = await knex('users').where({ Username: username }).first();
+        if (!user) {
+            return res.status(401).send('Invalid username or password');
+        }
+        const isPasswordMatch = await bcrypt.compare(password, user.Password);
+        if (isPasswordMatch) {
+            res.json({ 
+                Id: user.Id, 
+                FirstName: user.FirstName, 
+                LastName: user.LastName 
+            });
+        } else {
+            res.status(401).send('Invalid username or password');
+        }
+    } catch (error) {
+        console.error('Error during sign-in:', error);
+        res.status(500).send('Failed to sign in');
     }
 });
 
