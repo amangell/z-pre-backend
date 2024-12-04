@@ -118,15 +118,12 @@ app.post('/items', async (req, res) => {
     }
 });
 
-// PUT request to update an item's details
 app.put('/items/:id', async (req, res) => {
     const { id } = req.params;
     const { ItemName, Description, Quantity } = req.body;
-
     if (!ItemName || !Description || !Quantity) {
         return res.status(400).json({ error: 'All fields are required.' });
     }
-
     try {
         const updatedRows = await knex('items')
             .where({ id })
@@ -135,7 +132,6 @@ app.put('/items/:id', async (req, res) => {
                 Description,
                 Quantity,
             });
-
         if (updatedRows) {
             res.status(200).json({ message: 'Item updated successfully' });
         } else {
@@ -149,7 +145,6 @@ app.put('/items/:id', async (req, res) => {
 
 app.delete('/items/:id', async (req, res) => {
     const { id } = req.params;
-
     try {
         const deletedRows = await knex('items').where({ id }).del();
         if (deletedRows) {
